@@ -1,5 +1,14 @@
 # 📋 CHANGELOG - @purecore/apify
 
+## [Release] v0.9.0-multer-rip
+
+### What's Changed
+
+- ✨ **Multer Rip** - Extração do middleware de upload (`uploadify`) para um pacote isolado (`multer-rip`).
+- 📦 **Package Structure** - Criação de `package.json` e `tsconfig.json` para o novo pacote.
+- 🛠️ **Type Safety** - Definição de tipos locais (`types.ts`) para remover dependência do projeto principal.
+- 🧹 **Refactor** - Atualização de imports para usar tipos locais.
+
 ## [Release] v0.8.1-dependency-fix
 
 ### What's Changed
@@ -88,7 +97,7 @@ app.post(
   createValidatedHandler(ProductValidator.validate, async (req, res) => {
     const product = await createProduct(req.body);
     res.status(201).json({ product });
-  })
+  }),
 );
 
 app.listen(3000, () => {
