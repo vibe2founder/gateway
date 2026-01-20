@@ -387,8 +387,8 @@ ${fieldDeclarations}
         ),
     );
 
-    return `import { ${interfaceName} } from '../../types/interface';
-import { ${name}DTO } from '../../types/dto';
+    return `import { ${interfaceName} } from '../types/interface';
+import { ${name}DTO } from '../types/dto';
 
 export interface ${repositoryName}Query {
   ${searchableFields.map((f) => `${f.name}?: string;`).join("\n  ")}
@@ -519,12 +519,12 @@ export class ${repositoryName} {
     const serviceName = `${name}Service`;
     const dtoName = `${name}DTO`;
 
-    return `import { Request, Response } from '../../../../types';
+    return `import { Request, Response } from '../../../types';
 import { ${serviceName} } from '../services/${ZodSchemaAnalyzer.toCamelCase(
       name,
     )}.service';
 import { ${dtoName} } from '../types/dto';
-import { ApifyCompleteSentinel } from '../../../../decorators';
+import { ApifyCompleteSentinel } from '../../../decorators';
 
 export class ${controllerName} {
   constructor(private ${ZodSchemaAnalyzer.toCamelCase(
@@ -678,7 +678,7 @@ export class ${controllerName} {
     const serviceName = `${name}Service`;
     const repositoryName = `${name}Repository`;
 
-    return `import { Router } from '../../../router';
+    return `import { Router } from '../../router';
 import { ${controllerName} } from './controllers/${ZodSchemaAnalyzer.toCamelCase(
       name,
     )}.controller';

@@ -111,8 +111,6 @@ export class Apify extends Router {
 
     const modulesRouter = new Router();
     const modulesPath = join(process.cwd(), "src", "modules");
-    console.log(`[Apify] Loading modules from: ${modulesPath}`);
-    console.log(`[Apify] CWD: ${process.cwd()}`);
 
     try {
       // Executa auto-geração baseada em schemas Zod antes de carregar módulos

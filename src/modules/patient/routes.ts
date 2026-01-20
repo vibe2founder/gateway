@@ -1,4 +1,4 @@
-import { Router } from '../../../router';
+import { Router } from '../../router';
 import { PatientController } from './controllers/patient.controller';
 import { PatientService } from './services/patient.service';
 import { PatientRepository } from './database/repository';
