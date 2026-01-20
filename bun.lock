@@ -5,7 +5,7 @@
       "name": "@purecore/apify",
       "dependencies": {
         "@prisma/client": "5",
-        "@purecore/one-jwt-4-all": "^1.3.0",
+        "@purecore/one-jwt-4-all": "workspace:*",
         "@purecore/reqify": "workspace:*",
         "@radix-ui/react-label": "^2.1.8",
         "@radix-ui/react-slot": "^1.2.4",
@@ -82,6 +82,10 @@
       "dependencies": {
         "ws": "^8.16.0",
       },
+    },
+    "src/packages/purecore-one-jwt-4-all": {
+      "name": "@purecore/one-jwt-4-all",
+      "version": "1.0.0",
     },
     "src/packages/purecore-reqify": {
       "name": "@purecore/reqify",
@@ -267,7 +271,7 @@
 
     "@purecore/native-multer": ["@purecore/native-multer@workspace:src/packages/native-multer"],
 
-    "@purecore/one-jwt-4-all": ["@purecore/one-jwt-4-all@1.3.0", "", { "dependencies": { "@types/node": "^25.0.3", "undici-types": "^7.16.0" } }, "sha512-f90BxHVz5RozGwf1ZEXXIwMaCKZEg7GC1qAwvA52e7qihwb2Qc0JTtHu7OiyQbGvZLq4VzhVJjnz9j4BxSJnpA=="],
+    "@purecore/one-jwt-4-all": ["@purecore/one-jwt-4-all@workspace:src/packages/purecore-one-jwt-4-all"],
 
     "@purecore/purecore-testify": ["@purecore/purecore-testify@workspace:src/packages/purecore-testify"],
 
@@ -756,8 +760,6 @@
     "@isaacs/cliui/strip-ansi": ["strip-ansi@7.1.2", "", { "dependencies": { "ansi-regex": "^6.0.1" } }, "sha512-gmBGslpoQJtgnMAvOVqGZpEz9dyoKTCzy2nfz/n8aIFhN/jCE/rCmcxabB6jOOHV+0WNnylOxaxBQPSvcWklhA=="],
 
     "@isaacs/cliui/wrap-ansi": ["wrap-ansi@8.1.0", "", { "dependencies": { "ansi-styles": "^6.1.0", "string-width": "^5.0.1", "strip-ansi": "^7.0.1" } }, "sha512-si7QWI6zUMq56bESFvagtmzMdGOtoxfR+Sez11Mobfc7tm+VkUckk9bW2UeffTGVUbOksxmSw0AA2gs8g71NCQ=="],
-
-    "@purecore/one-jwt-4-all/@types/node": ["@types/node@25.0.3", "", { "dependencies": { "undici-types": "~7.16.0" } }, "sha512-W609buLVRVmeW693xKfzHeIV6nJGGz98uCPfeXI1ELMLXVeKYZ9m15fAMSaUPBHYLGFsVRcMmSCksQOrZV9BYA=="],
 
     "@purecore/purecore-testify/@types/node": ["@types/node@24.10.1", "", { "dependencies": { "undici-types": "~7.16.0" } }, "sha512-GNWcUTRBgIRJD5zj+Tq0fKOJ5XZajIiBroOF0yvj2bSU1WvNdYS/dn9UxwsujGW4JX06dnHyjV2y9rRaybH0iQ=="],
 

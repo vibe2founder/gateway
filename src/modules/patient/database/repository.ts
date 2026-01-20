@@ -1,5 +1,5 @@
-import { IPatient } from '../types/interface';
-import { PatientDTO } from '../types/dto';
+import { IPatient } from '../../types/interface';
+import { PatientDTO } from '../../types/dto';
 
 export interface PatientRepositoryQuery {
   name?: string;

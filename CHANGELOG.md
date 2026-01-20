@@ -1,5 +1,17 @@
 # 📋 CHANGELOG - @purecore/apify
 
+## [Release] v1.0.0-eac
+
+### What's Changed
+
+- ✨ **Everything as Code (EaC)** - Implementação do motor declarativo para módulos, executores e rotas.
+- 📦 **Nativo & Local** - Recriação da `@purecore/one-jwt-4-all` como pacote local em `src/packages` seguindo as diretrizes do projeto.
+- 🛠️ **Import Path Fix** - Correção da lógica de geração de caminhos relativos no `zod-analyzer` para suporte a estruturas de pastas profundas.
+- 🚀 **Runtime Engine** - Integração do `EaCRuntime` no core do `Apify` com suporte a `pathToFileURL` para compatibilidade total com WSL.
+- ✅ **Validation Suite** - Adição de `test-eac.ts` para validação de ciclo de vida completo do runtime.
+
+---
+
 ## [Release] v0.9.0-multer-rip
 
 ### What's Changed

@@ -1,7 +1,7 @@
-import { Request, Response } from '../../types';
+import { Request, Response } from '../../../../types';
 import { PatientService } from '../services/patient.service';
 import { PatientDTO } from '../types/dto';
-import { ApifyCompleteSentinel } from '../../decorators';
+import { ApifyCompleteSentinel } from '../../../../decorators';
 
 export class PatientController {
   constructor(private patientService: PatientService) {}

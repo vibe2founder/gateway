@@ -6,6 +6,7 @@ import {
 } from "node:http";
 import { readdirSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import { Router } from "./router";
 import { Request, Response, NextFunction, RequestHandler } from "./types";
 import { errorHandler, autoAONMiddleware } from "./middlewares";
@@ -14,6 +15,8 @@ import { initI18n } from "./i18n";
 import { getResilientFallback, ResilientConfig } from "./healer";
 import { autoGenerateFromZodSchemas } from "./auto-generator";
 import { AONConfig } from "./aon/index.js";
+import { EaCRuntime } from "./core/runtime";
+import { ModuleDeclaration } from "./models/declaration.model";
 // Import will be conditional to avoid build issues if file doesn't exist
 
 export class Apify extends Router {
@@ -30,6 +33,7 @@ export class Apify extends Router {
     this.resilientConfig = resilientConfig || {};
     this.aonConfig = aonConfig || {};
     this.initializeI18n();
+    EaCRuntime.init(this);
   }
 
   /**
@@ -76,6 +80,13 @@ export class Apify extends Router {
   }
 
   /**
+   * Registra um módulo explorando Everything as Code
+   */
+  registerEaCModule(declaration: ModuleDeclaration): void {
+    EaCRuntime.register(declaration);
+  }
+
+  /**
    * Obtém estatísticas do sistema resiliente
    */
   getResilientStats() {
@@ -100,6 +111,8 @@ export class Apify extends Router {
 
     const modulesRouter = new Router();
     const modulesPath = join(process.cwd(), "src", "modules");
+    console.log(`[Apify] Loading modules from: ${modulesPath}`);
+    console.log(`[Apify] CWD: ${process.cwd()}`);
 
     try {
       // Executa auto-geração baseada em schemas Zod antes de carregar módulos
@@ -111,8 +124,30 @@ export class Apify extends Router {
         dryRun: false,
       });
 
+      // Carrega módulos declarativos (EaC) que terminam em -eac.ts
+      const files = readdirSync(modulesPath);
+      for (const file of files) {
+        if (file.endsWith("-eac.ts")) {
+          try {
+            const fullEacPath = resolve(join(modulesPath, file));
+            const module = await import(fullEacPath);
+            const firstDeclaration = Object.values(module).find(
+              (exp) => exp && typeof exp === "object" && "executors" in exp,
+            );
+            if (firstDeclaration) {
+              this.registerEaCModule(firstDeclaration as ModuleDeclaration);
+            }
+          } catch (error) {
+            console.warn(
+              `❌ Erro ao carregar módulo EaC ${file}:`,
+              (error as Error).message,
+            );
+          }
+        }
+      }
+
       const moduleFolders = readdirSync(modulesPath).filter((item: string) =>
-        statSync(join(modulesPath, item)).isDirectory()
+        statSync(join(modulesPath, item)).isDirectory(),
       );
 
       for (const moduleName of moduleFolders) {
@@ -128,8 +163,8 @@ export class Apify extends Router {
           }
 
           // Import dinâmico do módulo
-          const moduleUrl = `file://${resolve(routesPath)}`;
-          const module = await import(moduleUrl);
+          const fullRoutePath = resolve(routesPath);
+          const module = await import(fullRoutePath);
 
           // Procura por um router exportado (pode ser default ou named export)
           let router: Router;
@@ -145,7 +180,7 @@ export class Apify extends Router {
           } else {
             // Se não encontrou um router específico, assume que o primeiro export é um Router
             const firstExport = Object.values(module).find(
-              (exp) => exp instanceof Router
+              (exp) => exp instanceof Router,
             );
             if (firstExport) {
               router = firstExport as Router;
@@ -158,12 +193,12 @@ export class Apify extends Router {
           // Registra o router do módulo
           modulesRouter.use(`/${moduleName}`, router);
           console.log(
-            `✅ Módulo ${moduleName} carregado em ${this.apiPrefix}/${moduleName}`
+            `✅ Módulo ${moduleName} carregado em ${this.apiPrefix}/${moduleName}`,
           );
         } catch (error) {
           console.warn(
             `❌ Erro ao carregar módulo ${moduleName}:`,
-            (error as Error).message
+            (error as Error).message,
           );
         }
       }
@@ -174,7 +209,7 @@ export class Apify extends Router {
     } catch (error) {
       console.warn(
         "⚠️  Pasta src/modules não encontrada ou erro ao ler módulos:",
-        (error as Error).message
+        (error as Error).message,
       );
     }
   }
@@ -224,7 +259,7 @@ export class Apify extends Router {
     resilientFallback.setAvailableRoutes(this.registeredRoutes);
 
     console.log(
-      `🛡️ Sistema resiliente ativado: ${this.registeredRoutes.length} rotas registradas`
+      `🛡️ Sistema resiliente ativado: ${this.registeredRoutes.length} rotas registradas`,
     );
 
     const server = createServer(
@@ -262,15 +297,16 @@ export class Apify extends Router {
           // Se não houve erro mas nenhuma rota respondeu, é 404
           if (!res.writableEnded) {
             const notFoundError = new NotFoundError(
-              `Cannot ${req.method} ${appReq.originalUrl}`
+              `Cannot ${req.method} ${appReq.originalUrl}`,
             );
             return errorHandler(notFoundError, appReq, appRes, () => {});
           }
+          return;
         };
 
         // 4. Passa a bola para a lógica do Router (herdada!)
         await this.handle(appReq, appRes, finalHandler);
-      }
+      },
     );
 
     return server.listen(port, callback);
@@ -278,7 +314,7 @@ export class Apify extends Router {
 
   // --- Helpers Privados ---
 
-  private augmentRequest(req: Request) {
+  private augmentRequest(req: Request): void {
     req.originalUrl = (req as any).url || "/";
     req.baseUrl = "";
     req.params = {};
@@ -288,7 +324,7 @@ export class Apify extends Router {
     // Parse Query String
     const urlObj = new URL(
       (req as any).url || "/",
-      `http://${(req as any).headers.host}`
+      `http://${(req as any).headers.host}`,
     );
     req.query = Object.fromEntries(urlObj.searchParams);
     (req as any).url = urlObj.pathname; // URL interna trabalha só com o pathname
@@ -337,7 +373,7 @@ export async function routesFromModules(): Promise<Router> {
 
   try {
     const moduleFolders = readdirSync(modulesPath).filter((item: string) =>
-      statSync(join(modulesPath, item)).isDirectory()
+      statSync(join(modulesPath, item)).isDirectory(),
     );
 
     for (const moduleName of moduleFolders) {
@@ -369,7 +405,7 @@ export async function routesFromModules(): Promise<Router> {
           router = module[`${moduleName}Router`];
         } else {
           const firstExport = Object.values(module).find(
-            (exp) => exp instanceof Router
+            (exp) => exp instanceof Router,
           );
           if (firstExport) {
             router = firstExport as Router;
@@ -385,14 +421,14 @@ export async function routesFromModules(): Promise<Router> {
       } catch (error) {
         console.warn(
           `❌ Erro ao carregar módulo ${moduleName}:`,
-          (error as Error).message
+          (error as Error).message,
         );
       }
     }
   } catch (error) {
     console.warn(
       "⚠️  Pasta src/modules não encontrada:",
-      (error as Error).message
+      (error as Error).message,
     );
   }
 

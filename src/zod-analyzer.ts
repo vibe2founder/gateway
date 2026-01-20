@@ -48,7 +48,7 @@ export class ZodSchemaAnalyzer {
    */
   static analyzeSchema(
     schema: z.ZodSchema,
-    entityName: string
+    entityName: string,
   ): EntityMetadata {
     const fields: ZodFieldMetadata[] = [];
 
@@ -59,7 +59,7 @@ export class ZodSchemaAnalyzer {
       for (const [fieldName, fieldSchema] of Object.entries(shape)) {
         const fieldMetadata = this.analyzeField(
           fieldName,
-          fieldSchema as z.ZodTypeAny
+          fieldSchema as z.ZodTypeAny,
         );
         fields.push(fieldMetadata);
       }
@@ -68,7 +68,7 @@ export class ZodSchemaAnalyzer {
     // Verifica se tem campos especiais
     const hasId = fields.some((f) => f.name === "id");
     const hasTimestamps = fields.some((f) =>
-      ["createdAt", "updatedAt", "created_at", "updated_at"].includes(f.name)
+      ["createdAt", "updatedAt", "created_at", "updated_at"].includes(f.name),
     );
 
     // Define chave primária
@@ -92,7 +92,7 @@ export class ZodSchemaAnalyzer {
    */
   private static analyzeField(
     fieldName: string,
-    fieldSchema: z.ZodTypeAny
+    fieldSchema: z.ZodTypeAny,
   ): ZodFieldMetadata {
     const metadata: ZodFieldMetadata = {
       name: fieldName,
@@ -142,7 +142,7 @@ export class ZodSchemaAnalyzer {
       for (const [nestedName, nestedSchema] of Object.entries(shape)) {
         const nestedField = this.analyzeField(
           nestedName,
-          nestedSchema as z.ZodTypeAny
+          nestedSchema as z.ZodTypeAny,
         );
         metadata.nestedFields.push(nestedField);
       }
@@ -383,12 +383,12 @@ ${fieldDeclarations}
       (f) =>
         f.type === "string" &&
         !["id", "createdAt", "updatedAt", "created_at", "updated_at"].includes(
-          f.name
-        )
+          f.name,
+        ),
     );
 
-    return `import { ${interfaceName} } from '../types/interface';
-import { ${name}DTO } from '../types/dto';
+    return `import { ${interfaceName} } from '../../types/interface';
+import { ${name}DTO } from '../../types/dto';
 
 export interface ${repositoryName}Query {
   ${searchableFields.map((f) => `${f.name}?: string;`).join("\n  ")}
@@ -412,8 +412,8 @@ export class ${repositoryName} {
    * Cria uma nova entidade
    */
   async create(data: Omit<${interfaceName}, '${
-      primaryKey || "id"
-    }'>): Promise<${interfaceName}> {
+    primaryKey || "id"
+  }'>): Promise<${interfaceName}> {
     const id = Date.now().toString();
     const entity: ${interfaceName} = {
       ${primaryKey || "id"}: id,
@@ -447,7 +447,7 @@ export class ${repositoryName} {
       results = results.filter(entity =>
         entity.${f.name}?.toLowerCase().includes(query.${f.name}!.toLowerCase())
       );
-    }`
+    }`,
       )
       .join("")}
 
@@ -519,16 +519,16 @@ export class ${repositoryName} {
     const serviceName = `${name}Service`;
     const dtoName = `${name}DTO`;
 
-    return `import { Request, Response } from '../../types';
+    return `import { Request, Response } from '../../../../types';
 import { ${serviceName} } from '../services/${ZodSchemaAnalyzer.toCamelCase(
-      name
+      name,
     )}.service';
 import { ${dtoName} } from '../types/dto';
-import { ApifyCompleteSentinel } from '../../decorators';
+import { ApifyCompleteSentinel } from '../../../../decorators';
 
 export class ${controllerName} {
   constructor(private ${ZodSchemaAnalyzer.toCamelCase(
-    serviceName
+    serviceName,
   )}: ${serviceName}) {}
 
   /**
@@ -546,7 +546,7 @@ export class ${controllerName} {
       } = req.query;
 
       const result = await this.${ZodSchemaAnalyzer.toCamelCase(
-        serviceName
+        serviceName,
       )}.list({
         page: parseInt(page as string),
         limit: parseInt(limit as string),
@@ -582,7 +582,7 @@ export class ${controllerName} {
       const { id } = req.params;
 
       const entity = await this.${ZodSchemaAnalyzer.toCamelCase(
-        serviceName
+        serviceName,
       )}.getById(id);
 
       res.json({
@@ -605,7 +605,7 @@ export class ${controllerName} {
   async create(req: Request, res: Response) {
     try {
       const entity = await this.${ZodSchemaAnalyzer.toCamelCase(
-        serviceName
+        serviceName,
       )}.create(req.body);
 
       res.status(201).json({
@@ -630,7 +630,7 @@ export class ${controllerName} {
       const { id } = req.params;
 
       const entity = await this.${ZodSchemaAnalyzer.toCamelCase(
-        serviceName
+        serviceName,
       )}.update(id, req.body);
 
       res.json({
@@ -678,24 +678,24 @@ export class ${controllerName} {
     const serviceName = `${name}Service`;
     const repositoryName = `${name}Repository`;
 
-    return `import { Router } from '../../router';
-import { ${controllerName} } from '../controllers/${ZodSchemaAnalyzer.toCamelCase(
-      name
+    return `import { Router } from '../../../router';
+import { ${controllerName} } from './controllers/${ZodSchemaAnalyzer.toCamelCase(
+      name,
     )}.controller';
-import { ${serviceName} } from '../services/${ZodSchemaAnalyzer.toCamelCase(
-      name
+import { ${serviceName} } from './services/${ZodSchemaAnalyzer.toCamelCase(
+      name,
     )}.service';
-import { ${repositoryName} } from '../database/repository';
+import { ${repositoryName} } from './database/repository';
 
 // Instâncias dos serviços
 const ${ZodSchemaAnalyzer.toCamelCase(
-      repositoryName
+      repositoryName,
     )} = new ${repositoryName}();
 const ${ZodSchemaAnalyzer.toCamelCase(
-      serviceName
+      serviceName,
     )} = new ${serviceName}(${ZodSchemaAnalyzer.toCamelCase(repositoryName)});
 const ${ZodSchemaAnalyzer.toCamelCase(
-      controllerName
+      controllerName,
     )} = new ${controllerName}(${ZodSchemaAnalyzer.toCamelCase(serviceName)});
 
 // Criação do router
@@ -703,19 +703,19 @@ const router = new Router();
 
 // Rotas CRUD
 router.get('/', ${ZodSchemaAnalyzer.toCamelCase(
-      controllerName
+      controllerName,
     )}.list.bind(${ZodSchemaAnalyzer.toCamelCase(controllerName)}));
 router.post('/', ${ZodSchemaAnalyzer.toCamelCase(
-      controllerName
+      controllerName,
     )}.create.bind(${ZodSchemaAnalyzer.toCamelCase(controllerName)}));
 router.get('/:id', ${ZodSchemaAnalyzer.toCamelCase(
-      controllerName
+      controllerName,
     )}.getById.bind(${ZodSchemaAnalyzer.toCamelCase(controllerName)}));
 router.put('/:id', ${ZodSchemaAnalyzer.toCamelCase(
-      controllerName
+      controllerName,
     )}.update.bind(${ZodSchemaAnalyzer.toCamelCase(controllerName)}));
 router.delete('/:id', ${ZodSchemaAnalyzer.toCamelCase(
-      controllerName
+      controllerName,
     )}.delete.bind(${ZodSchemaAnalyzer.toCamelCase(controllerName)}));
 
 export { router as ${ZodSchemaAnalyzer.toCamelCase(name)}Router };
@@ -775,16 +775,16 @@ export default ${name}Config;`;
 // Exportações principais
 export { ${ZodSchemaAnalyzer.toCamelCase(name)}Router } from './routes';
 export { ${name}Controller } from './controllers/${ZodSchemaAnalyzer.toCamelCase(
-      name
+      name,
     )}.controller';
 export { ${name}Service } from './services/${ZodSchemaAnalyzer.toCamelCase(
-      name
+      name,
     )}.service';
 export { ${name}Repository } from './database/repository';
 export { ${name}DTO } from './types/dto';
 export { I${name} } from './types/interface';
 export { default as ${ZodSchemaAnalyzer.toCamelCase(
-      name
+      name,
     )}Config } from './config';
 
 // Re-export do schema Zod original
@@ -854,11 +854,11 @@ export const ${ZodSchemaAnalyzer.toCamelCase(name)}IndexesSQL = [
 ${fields
   .filter(
     (f) =>
-      f.type === "string" && !["id", "createdAt", "updatedAt"].includes(f.name)
+      f.type === "string" && !["id", "createdAt", "updatedAt"].includes(f.name),
   )
   .map(
     (f) =>
-      `  \`CREATE INDEX idx_${tableName}_${f.name} ON \`${tableName}\` (\`${f.name}\`);\``
+      `  \`CREATE INDEX idx_${tableName}_${f.name} ON \`${tableName}\` (\`${f.name}\`);\``,
   )
   .join(",\n")}
 ].filter(Boolean);
@@ -881,10 +881,10 @@ export { schema } from '../${ZodSchemaAnalyzer.toCamelCase(name)}';`;
  */
 
 import { ${controllerName} } from '../controllers/${ZodSchemaAnalyzer.toCamelCase(
-      name
+      name,
     )}.controller';
 import { ${serviceName} } from '../services/${ZodSchemaAnalyzer.toCamelCase(
-      name
+      name,
     )}.service';
 import { ${repositoryName} } from '../../database/repository';
 
@@ -901,7 +901,7 @@ describe('${name} Module', () => {
 
   describe('${serviceName}', () => {
     it('should create a new ${ZodSchemaAnalyzer.toCamelCase(
-      name
+      name,
     )}', async () => {
       const testData = {
         // Adicionar dados de teste baseados nos campos do schema
@@ -925,7 +925,7 @@ describe('${name} Module', () => {
     });
 
     it('should list ${ZodSchemaAnalyzer.toCamelCase(
-      name
+      name,
     )}s with pagination', async () => {
       // Criar alguns registros de teste
       for (let i = 0; i < 5; i++) {
@@ -972,7 +972,7 @@ describe('${name} Module', () => {
 
   describe('${controllerName}', () => {
     it('should handle GET / - list ${ZodSchemaAnalyzer.toCamelCase(
-      name
+      name,
     )}s', async () => {
       const mockReq = {
         query: {}
@@ -995,7 +995,7 @@ describe('${name} Module', () => {
     });
 
     it('should handle POST / - create ${ZodSchemaAnalyzer.toCamelCase(
-      name
+      name,
     )}', async () => {
       const mockReq = {
         body: {
@@ -1182,12 +1182,13 @@ export class ${serviceName} {
     // Validações específicas podem ser adicionadas aqui
     ${fields
       .filter(
-        (f) => !f.isOptional && !f.hasDefault && f.name !== (primaryKey || "id")
+        (f) =>
+          !f.isOptional && !f.hasDefault && f.name !== (primaryKey || "id"),
       )
       .map((f) => {
         if (
           f.validations.some(
-            (v) => v.type === "min" && typeof v.value === "number"
+            (v) => v.type === "min" && typeof v.value === "number",
           )
         ) {
           const min = f.validations.find((v) => v.type === "min")?.value;
@@ -1206,8 +1207,8 @@ export class ${serviceName} {
   }
 
   private async processCreateInput(input: ${serviceName}CreateInput): Promise<Omit<${interfaceName}, '${
-      primaryKey || "id"
-    }'>> {
+    primaryKey || "id"
+  }'>> {
     // Processamentos específicos antes da criação
     return input;
   }
