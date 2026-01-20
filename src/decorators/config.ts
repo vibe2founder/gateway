@@ -138,7 +138,7 @@ export const CORSGuard = (options: CORSOptions = {}): MethodDecorator => {
       if (exposedHeaders.length > 0) {
         res.setHeader(
           "Access-Control-Expose-Headers",
-          exposedHeaders.join(", ")
+          exposedHeaders.join(", "),
         );
       }
 
@@ -235,13 +235,13 @@ export {
  * Autoescale Sentinel - Para endpoints que precisam de alta disponibilidade
  */
 export const AutoescaleSentinel = PresetDecoratorFactory([
-  Logs,
-  Metrics,
-  TraceSpan,
+  Logs(),
+  Metrics(),
+  TraceSpan(),
   SmartCache({ ttl: 300 } as any),
-  CircuitBreaker,
-  Timeout,
-  Failover,
+  CircuitBreaker(),
+  Timeout(),
+  Failover(),
   AuthExpressGuard,
 ]);
 
@@ -261,7 +261,7 @@ export const SecuritySentinel = PresetDecoratorFactory([
 export const PerformanceSentinel = PresetDecoratorFactory([
   CQRS,
   SmartCache({ ttl: 300 }),
-  CORSGuard,
+  CORSGuard(),
   HSTSGuard,
   XSSGuard,
 ]);
@@ -270,13 +270,13 @@ export const PerformanceSentinel = PresetDecoratorFactory([
  * Apify Sentinel - Preset completo para APIs @purecore/apify
  */
 export const ApifySentinel = PresetDecoratorFactory([
-  Logs,
-  Metrics,
-  TraceSpan,
+  Logs(),
+  Metrics(),
+  TraceSpan(),
   SmartCache({ ttl: 300 }),
-  CircuitBreaker,
-  Timeout,
-  Failover,
+  CircuitBreaker(),
+  Timeout(),
+  Failover(),
   AuthExpressGuard,
 ]);
 
@@ -286,9 +286,9 @@ export const ApifySentinel = PresetDecoratorFactory([
  */
 export const ApifyCompleteSentinel = PresetDecoratorFactory([
   // Observabilidade
-  Logs,
-  Metrics,
-  TraceSpan,
+  Logs(),
+  Metrics(),
+  TraceSpan(),
 
   // Resiliência
   CircuitBreaker({ failureThreshold: 5, resetTimeoutMs: 10000 }),
@@ -301,7 +301,7 @@ export const ApifyCompleteSentinel = PresetDecoratorFactory([
     enableRequestChunking: true,
     globalBlocking: true,
   }),
-  Failover,
+  Failover(),
 
   // Segurança (usando guards condicionais que respeitam NO_AUTH)
   AuthJwtGuard({ secret: process.env.JWT_SECRET }),
@@ -326,8 +326,8 @@ export const ApifyCompleteSentinel = PresetDecoratorFactory([
  * API Sentinel - Para endpoints REST com validação e cache
  */
 export const ApiSentinel = PresetDecoratorFactory([
-  Logs,
-  Metrics,
+  Logs(),
+  Metrics(),
   ApiCache(300), // 5 minutos de cache
   CatchHttpErrors({ logError: true }),
   AuthExpressGuard,
@@ -337,9 +337,9 @@ export const ApiSentinel = PresetDecoratorFactory([
  * Database Sentinel - Para operações de banco com resiliência
  */
 export const DatabaseSentinel = PresetDecoratorFactory([
-  Logs,
-  CircuitBreaker,
-  Timeout,
+  Logs(),
+  CircuitBreaker(),
+  Timeout(),
   Memoization({ ttl: 60 }), // Cache por 1 minuto
   CatchWithRetry(3, 1000), // 3 tentativas com 1s de delay
 ]);
@@ -348,9 +348,9 @@ export const DatabaseSentinel = PresetDecoratorFactory([
  * External API Sentinel - Para chamadas a APIs externas
  */
 export const ExternalApiSentinel = PresetDecoratorFactory([
-  Logs,
-  CircuitBreaker,
-  Timeout,
+  Logs(),
+  CircuitBreaker(),
+  Timeout(),
   Memoization({ ttl: 300 }), // Cache por 5 minutos
   CatchWithRetry(2, 2000), // 2 tentativas com 2s de delay
 ]);
@@ -426,7 +426,7 @@ class WSRetryChannel {
         } catch (error) {
           console.error(
             `❌ Erro ao processar mensagem WS para ${routeKey}:`,
-            error
+            error,
           );
         }
       });
@@ -497,7 +497,7 @@ class WSRetryChannel {
           await this.processParallelRequest(
             routeKey,
             request.requestId,
-            request.data
+            request.data,
           );
 
           // Notifica via WS sobre sucesso
@@ -532,7 +532,7 @@ class WSRetryChannel {
   private async processParallelRequest(
     routeKey: string,
     requestId: string,
-    data: any
+    data: any,
   ): Promise<any> {
     // Simula processamento paralelo
     console.log(`⚡ Processando ${requestId} em paralelo para ${routeKey}`);
@@ -540,7 +540,7 @@ class WSRetryChannel {
     // Aqui seria integrada com o sistema de processamento real
     // Por enquanto, apenas simula
     await new Promise((resolve) =>
-      setTimeout(resolve, Math.random() * 2000 + 1000)
+      setTimeout(resolve, Math.random() * 2000 + 1000),
     );
 
     return { success: true, processedAt: Date.now() };
@@ -579,7 +579,7 @@ class WSRetryChannel {
         pendingRetries: queue.length,
       })),
       processingChannels: Array.from(this.processingChannels.entries()).filter(
-        ([, processing]) => processing
+        ([, processing]) => processing,
       ).length,
     };
   }
@@ -657,7 +657,7 @@ export function initializeDecorators() {
   console.log(
     `🔓 NO_AUTH routes excluídas: ${noAuthManager
       .getExcludedRoutes()
-      .join(", ")}`
+      .join(", ")}`,
   );
   console.log("🔗 WS Retry Channel: Ativado");
 
