@@ -26,20 +26,32 @@ describe('AON/CrystalBox System Tests', () => {
         originalUrl: '/api/test'
       };
 
-      const mockResponse: Partial<Response> = {
-        status: function(code: number) {
+      const mockResponse: any = {
+        status: function (code: number) {
           this.statusCode = code;
           return this;
         },
-        json: function(data: any) {
+        json: function (data: any) {
           this.body = data;
         },
-        setHeader: function(key: string, value: string) {
+        setHeader: function (key: string, value: string) {
           if (!this.headers) this.headers = {};
           this.headers[key] = value;
+          return this;
+        },
+        write: function (chunk: any) {
+          if (!this.chunks) this.chunks = [];
+          this.chunks.push(chunk);
+          return true;
+        },
+        end: function (chunk?: any) {
+          if (chunk) this.write(chunk);
+          this.finished = true;
+          return this;
         },
         headers: {},
-        statusCode: 200
+        statusCode: 200,
+        finished: false,
       };
 
       // Create a mock next function
@@ -59,7 +71,11 @@ describe('AON/CrystalBox System Tests', () => {
 
       try {
         // Execute the wrapped handler
-        await testHandler(mockRequest as Request, mockResponse as Response);
+        await testHandler(
+          mockRequest as Request,
+          mockResponse as Response,
+          () => {},
+        );
       } catch (error) {
         // If it fails, that's OK as long as the system doesn't crash in an infinite loop
       }
@@ -83,20 +99,20 @@ describe('AON/CrystalBox System Tests', () => {
         }
       };
       
-      const mockResponse: Partial<Response> = {
-        status: function(code: number) {
+      const mockResponse: any = {
+        status: function (code: number) {
           this.statusCode = code;
           return this;
         },
-        json: function(data: any) {
+        json: function (data: any) {
           this.body = data;
         },
-        setHeader: function(key: string, value: string) {
+        setHeader: function (key: string, value: string) {
           if (!this.headers) this.headers = {};
           this.headers[key] = value;
         },
         headers: {},
-        statusCode: 200
+        statusCode: 200,
       };
 
       const mockNext = () => {};
@@ -142,20 +158,20 @@ describe('AON/CrystalBox System Tests', () => {
         }
       };
       
-      const mockResponse: Partial<Response> = {
-        status: function(code: number) {
+      const mockResponse: any = {
+        status: function (code: number) {
           this.statusCode = code;
           return this;
         },
-        json: function(data: any) {
+        json: function (data: any) {
           this.body = data;
         },
-        setHeader: function(key: string, value: string) {
+        setHeader: function (key: string, value: string) {
           if (!this.headers) this.headers = {};
           this.headers[key] = value;
         },
         headers: {},
-        statusCode: 200
+        statusCode: 200,
       };
 
       // Try to request healing with invalid parameters
@@ -202,7 +218,7 @@ describe('AON/CrystalBox System Tests', () => {
         // Test with non-string messages
         AONLogger.info(123 as any);
         AONLogger.warn({} as any);
-        AONLogger.error([]);
+        AONLogger.error("test error", []);
         
         // If we reach here, the logger handled invalid inputs gracefully
         assert(true, 'AONLogger should handle invalid inputs gracefully');

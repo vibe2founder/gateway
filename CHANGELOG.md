@@ -1,5 +1,14 @@
 # 📋 CHANGELOG - @purecore/apify
 
+## [Release] v1.0.1-aon-fix
+
+### What's Changed
+
+- 🐛 **Streaming Fix** - Correção de `TypeError: this.response.write is not a function` adicionando verificações defensivas no `NDJSONStreamWriter`.
+- ✅ **Test Mock Update** - Atualização do mock de `Response` nos testes de sistema para incluir métodos `write` e `end`, garantindo cobertura de fluxos de streaming.
+- 🛡️ **Defensive Programming** - Adição de log de fallback quando o objeto de resposta não suporta escrita em stream.
+
+
 ## [Release] v1.0.0-eac
 
 ### What's Changed

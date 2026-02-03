@@ -70,7 +70,11 @@ export class NDJSONStreamWriter implements AONStreamWriter {
   private writeRawEvent(event: AONBaseEvent): void {
     try {
       const jsonLine = JSON.stringify(event) + "\n";
-      this.response.write(jsonLine);
+      if (typeof this.response.write === "function") {
+        this.response.write(jsonLine);
+      } else {
+        console.warn("[AON] Response object does not support write(). Event dumped to console:", jsonLine);
+      }
     } catch (error) {
       console.error("[AON] Erro ao serializar evento:", error);
     }
@@ -88,7 +92,9 @@ export class NDJSONStreamWriter implements AONStreamWriter {
       this.writeRawEvent(resultEvent);
 
       // Finaliza a conexão
-      this.response.end();
+      if (typeof this.response.end === "function") {
+        this.response.end();
+      }
       this.active = false;
     } catch (error) {
       console.error("[AON] Erro ao finalizar stream:", error);
@@ -116,7 +122,9 @@ export class NDJSONStreamWriter implements AONStreamWriter {
       this.writeRawEvent(errorEvent);
 
       // Finaliza a conexão
-      this.response.end();
+      if (typeof this.response.end === "function") {
+        this.response.end();
+      }
       this.active = false;
     } catch (writeError) {
       console.error("[AON] Erro ao escrever evento de erro:", writeError);
