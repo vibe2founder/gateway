@@ -285,9 +285,24 @@ export class StorageUtils {
    * Gera nome de arquivo seguro
    */
   static safeFilename(originalname: string): string {
-    const ext = originalname.split('.').pop() || '';
-    const name = originalname.replace(/\.[^/.]+$/, '').replace(/[^a-zA-Z0-9]/g, '_');
-    return `${name}_${Date.now()}_${randomUUID().slice(0, 8)}.${ext}`;
+    // Extrai apenas o nome do arquivo do caminho (remove diretórios)
+    const basename = originalname.split('/').pop()?.split('\\').pop() || '';
+
+    // Separa nome e extensão
+    const lastDotIndex = basename.lastIndexOf('.');
+    let namePart = basename;
+    let extension = '';
+
+    if (lastDotIndex > 0) { // Garante que o ponto não seja o primeiro caractere
+      namePart = basename.substring(0, lastDotIndex);
+      extension = basename.substring(lastDotIndex + 1);
+    }
+
+    // Sanitiza o nome do arquivo (substitui caracteres não alfanuméricos por underscore)
+    const sanitizedName = namePart.replace(/[^a-zA-Z0-9]/g, '_');
+
+    // Adiciona timestamp e UUID para garantir unicidade
+    return `${sanitizedName}_${Date.now()}_${randomUUID().slice(0, 8)}.${extension}`;
   }
 
   /**

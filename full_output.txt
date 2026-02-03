@@ -1,0 +1,64 @@
+Ô£à AON (Adaptive Observability Negotiation) v1.0.0 carregado
+­ƒôï Especifica├º├úo AONP v1.0.0 implementada
+ÔØä´©Å­ƒæü´©Å CrystalBox Mode v1.0.0 dispon├¡vel
+­ƒöº Ambiente: development
+­ƒôí Modos: Black Box | Glass Box | ÔØä´©Å­ƒæü´©Å CrystalBox
+­ƒÄ¿ Sistema de Decorators @purecore/apify inicializado
+­ƒöº Inicializando sistemas especiais...
+­ƒöô NO_AUTH routes exclu├¡das: get /health, post /login, get /status
+­ƒöù WS Retry Channel: Ativado
+­ƒôª Presets dispon├¡veis:
+  ÔÇó AutoescaleSentinel - Alta disponibilidade
+  ÔÇó SecuritySentinel - Seguran├ºa m├íxima
+  ÔÇó PerformanceSentinel - Performance otimizada
+  ÔÇó ApifySentinel - Preset completo
+  ÔÇó ApiSentinel - Para endpoints REST
+  ÔÇó DatabaseSentinel - Para opera├º├Áes DB
+  ÔÇó ExternalApiSentinel - Para APIs externas
+  ÔÇó ApifyCompleteSentinel - Ô¡É CONFIGURA├ç├âO PADR├âO COMPLETA Ô¡É
+
+­ƒÜÇ ApifyCompleteSentinel inclui:
+  ÔÇó Circuit Breaker (5 falhas, reset 10s)
+  ÔÇó Timeout (30s, max 60s, 3 retries)
+  ÔÇó WS Retry Channel para processamento paralelo
+  ÔÇó Logger, Metrics, TraceSpan
+  ÔÇó JWT Auth (com suporte NO_AUTH)
+  ÔÇó XSS Protection
+  ÔÇó Smart Cache (5min TTL)
+
+ÔÜÖ´©Å  Configura├º├Áes via .env:
+  ÔÇó NO_AUTH - Exclui rotas da autentica├º├úo
+  ÔÇó JWT_SECRET - Segredo para tokens JWT
+  ÔÇó Exemplo: NO_AUTH="GET /health, POST /login, GET /status"
+­ƒÜÇ Testing Everything as Code...
+­ƒöº Verificando necessidade de auto-gera├º├úo de c├│digo...
+­ƒÜÇ Iniciando auto-gera├º├úo de c├│digo baseado em schemas Zod...
+­ƒôä Arquivo standalone detectado: orders-eac.ts -> Gerando m├│dulo orders-eac
+Ô£à Sistema de internacionaliza├º├úo inicializado (pt-BR)
+ÔÜá´©Å  Arquivo orders-eac.ts n├úo exporta schema Zod v├ílido
+­ƒôé Verificando m├│dulo existente: patient
+Ô£à M├│dulo patient j├í possui estrutura completa
+­ƒôä Arquivo standalone detectado: patient.ts -> Gerando m├│dulo patient
+­ƒôè Schema analisado: 5 campos detectados
+­ƒÅù´©Å  Gerando estrutura para Patient...
+­ƒôØ Gerado: /mnt/d/www/Freelas/PROJETOS_OPENSOURCE/MEUS/@purecore/canonical/one-api-4-all/src/modules/patient/database/repository.ts
+­ƒôØ Gerado: /mnt/d/www/Freelas/PROJETOS_OPENSOURCE/MEUS/@purecore/canonical/one-api-4-all/src/modules/patient/database/schema.ts
+­ƒôØ Gerado: /mnt/d/www/Freelas/PROJETOS_OPENSOURCE/MEUS/@purecore/canonical/one-api-4-all/src/modules/patient/types/dto.ts
+­ƒôØ Gerado: /mnt/d/www/Freelas/PROJETOS_OPENSOURCE/MEUS/@purecore/canonical/one-api-4-all/src/modules/patient/types/interface.ts
+­ƒôØ Gerado: /mnt/d/www/Freelas/PROJETOS_OPENSOURCE/MEUS/@purecore/canonical/one-api-4-all/src/modules/patient/services/patient.service.ts
+­ƒôØ Gerado: /mnt/d/www/Freelas/PROJETOS_OPENSOURCE/MEUS/@purecore/canonical/one-api-4-all/src/modules/patient/controllers/patient.controller.ts
+­ƒôØ Gerado: /mnt/d/www/Freelas/PROJETOS_OPENSOURCE/MEUS/@purecore/canonical/one-api-4-all/src/modules/patient/routes.ts
+­ƒôØ Gerado: /mnt/d/www/Freelas/PROJETOS_OPENSOURCE/MEUS/@purecore/canonical/one-api-4-all/src/modules/patient/config.ts
+­ƒôØ Gerado: /mnt/d/www/Freelas/PROJETOS_OPENSOURCE/MEUS/@purecore/canonical/one-api-4-all/src/modules/patient/tests/patient.test.ts
+­ƒôØ Gerado: /mnt/d/www/Freelas/PROJETOS_OPENSOURCE/MEUS/@purecore/canonical/one-api-4-all/src/modules/patient/index.ts
+­ƒÄë M├│dulo Patient gerado com sucesso!
+­ƒÆ¥ Arquivo original mantido: /mnt/d/www/Freelas/PROJETOS_OPENSOURCE/MEUS/@purecore/canonical/one-api-4-all/src/modules/patient.ts
+Ô£à Auto-gera├º├úo conclu├¡da!
+[EaC Runtime] Module Orders registered and routes attached.
+Ô£à M├│dulo patient carregado em /api/v1/patient
+­ƒøí´©Å Sistema resiliente ativado: 0 rotas registradas
+Ô£à Server running on http://localhost:3355
+Try:
+  GET http://localhost:3355/api/v1/orders
+  POST http://localhost:3355/api/v1/orders with JSON body
+Test finished.

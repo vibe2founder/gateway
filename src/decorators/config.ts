@@ -242,28 +242,28 @@ export const AutoescaleSentinel = PresetDecoratorFactory([
   CircuitBreaker(),
   Timeout(),
   Failover(),
-  AuthExpressGuard,
+  AuthExpressGuard(),
 ]);
 
 /**
  * Security Sentinel - Foco em segurança máxima
  */
 export const SecuritySentinel = PresetDecoratorFactory([
-  CSRFGuard,
-  AuthJwtGuard,
-  IdempotentGuard,
-  XSSGuard,
+  CSRFGuard(),
+  AuthJwtGuard(),
+  IdempotentGuard(),
+  XSSGuard(),
 ]);
 
 /**
  * Performance Sentinel - Otimizado para performance
  */
 export const PerformanceSentinel = PresetDecoratorFactory([
-  CQRS,
+  CQRS(),
   SmartCache({ ttl: 300 }),
   CORSGuard(),
-  HSTSGuard,
-  XSSGuard,
+  HSTSGuard(),
+  XSSGuard(),
 ]);
 
 /**
@@ -277,7 +277,7 @@ export const ApifySentinel = PresetDecoratorFactory([
   CircuitBreaker(),
   Timeout(),
   Failover(),
-  AuthExpressGuard,
+  AuthExpressGuard(),
 ]);
 
 /**
@@ -305,7 +305,7 @@ export const ApifyCompleteSentinel = PresetDecoratorFactory([
 
   // Segurança (usando guards condicionais que respeitam NO_AUTH)
   AuthJwtGuard({ secret: process.env.JWT_SECRET }),
-  XSSGuard,
+  XSSGuard(),
 
   // Helmet.js - Headers de segurança HTTP completos
   HelmetGuard({
@@ -330,7 +330,7 @@ export const ApiSentinel = PresetDecoratorFactory([
   Metrics(),
   ApiCache(300), // 5 minutos de cache
   CatchHttpErrors({ logError: true }),
-  AuthExpressGuard,
+  AuthExpressGuard(),
 ]);
 
 /**

@@ -10,12 +10,12 @@ export type DecoratorFunction = (...args: any[]) => any;
  * @returns Decorator que aplica todos os decorators na ordem especificada
  */
 export function PresetDecoratorFactory<T extends DecoratorFunction[]>(
-  decorators: T
+  decorators: T,
 ) {
   return function (
     target: any,
     propertyKey?: string | symbol,
-    descriptor?: PropertyDescriptor
+    descriptor?: PropertyDescriptor,
   ) {
     // Aplica os decorators na ordem inversa (do último para o primeiro)
     // para que eles sejam executados na ordem correta
@@ -24,7 +24,16 @@ export function PresetDecoratorFactory<T extends DecoratorFunction[]>(
     for (let i = decorators.length - 1; i >= 0; i--) {
       const decorator = decorators[i];
       if (decorator) {
-        result = decorator(target, propertyKey, result) || result;
+        try {
+          // console.log(`[Preset] Applying decorator ${i} to ${String(propertyKey)}`);
+          result = decorator(target, propertyKey, result) || result;
+        } catch (error) {
+          console.error(
+            `[Preset] Error applying decorator ${i} to ${String(propertyKey)}:`,
+            error,
+          );
+          throw error;
+        }
       }
     }
 

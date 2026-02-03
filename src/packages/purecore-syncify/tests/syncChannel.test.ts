@@ -68,18 +68,27 @@ describe('SyncChannel', () => {
   });
 
   test('deve emitir eventos', async () => {
-    const [client, server] = SyncChannel.createPair<string, string>();
+    // Cria canais separadamente para poder adicionar listeners antes da conexão
+    const client = new SyncChannel<string, string>();
+    const server = new SyncChannel<string, string>();
     const events: string[] = [];
 
+    // Adiciona o listener antes da conexão para capturar o evento 'open'
     server.on((event) => {
       events.push(event.type);
     });
 
+    // Conecta manualmente para que o evento 'open' seja capturado
+    server.connect(client);
+    client.connect(server);
+
     server.onMessage(async () => 'ok');
 
+    // Agora envia uma mensagem para gerar o evento 'message'
     client.send('test');
     await delay(10);
 
+    // Agora ambos eventos devem estar presentes
     expect(events).toContain('open');
     expect(events).toContain('message');
   });

@@ -30,6 +30,7 @@
     "create:crud": "node dist/cli.js create crud",
     "example:ddd": "bun run examples/run-ddd-generator.ts",
     "example:ddd:test": "bun run examples/test-ddd-generator.ts",
+    "example:ddd:interface": "tsx examples/order.ddd.ts",
     "generate:schemas": "tsx generate-zod-schemas.ts",
     "demo:schemas": "tsx examples/zod-schema-generation.ts",
     "demo:fastify": "tsx examples/fastify-integration.ts",
@@ -40,6 +41,8 @@
     "demo:crystalbox": "tsx examples/crystalbox-example.ts",
     "benchmark": "node dist/benchmark.api.js",
     "test": "node --test test/*.test.js",
+    "build:reqify": "npm run build -w @purecore/reqify",
+    "test:heal": "npm run build:reqify && node --test --import tsx test-heal-tdd.test.ts test-heal-simulation.test.ts",
     "test:native": "tsx test/native-multipart.test.ts",
     "test:performance": "node --test test/performance.test.js",
     "monitor": "node --inspect dist/index.js"
@@ -50,6 +53,7 @@
   ],
   "devDependencies": {
     "@types/node": "^22.10.2",
+    "tsx": "^4.16.2",
     "autoprefixer": "^10.4.23",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.18",

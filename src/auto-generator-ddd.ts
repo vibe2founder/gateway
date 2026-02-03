@@ -34,13 +34,20 @@ import {
   existsSync,
   mkdirSync,
   writeFileSync,
+  readFileSync,
 } from "node:fs";
 import { join, resolve } from "node:path";
 import {
   ZodSchemaAnalyzer,
   CodeGenerator,
   EntityMetadata,
-} from "./zod-analyzer";
+} from "./zod-analyzer.js";
+import {
+  type DDDSchemaInput,
+  jsonSchemaToDDDSchema,
+  dddSchemaToEntityMetadata,
+  type JSONSchemaLike,
+} from "./ddd-schema-types.js";
 
 export interface DDDGenerationOptions {
   modulesPath?: string;
@@ -115,8 +122,11 @@ export class AutoGeneratorDDD {
         console.log(`   📁 Tipo: Diretório`);
         await this.processExistingModule(item, itemPath);
       } else if (item.endsWith(".schema.ts")) {
-        console.log(`   📄 Tipo: Schema Zod (.schema.ts)`);
+        console.log(`   📄 Tipo: Schema Zod ou DDDSchemaInput (.schema.ts)`);
         await this.generateFromStandaloneFile(item, itemPath, modulesPath);
+      } else if (item.endsWith(".schema.json")) {
+        console.log(`   📄 Tipo: JSON-Schema (.schema.json)`);
+        await this.generateFromJsonSchemaFile(item, itemPath, modulesPath);
       } else if (item.endsWith(".ts")) {
         console.log(
           `   🚫 Tipo: Arquivo TypeScript (não é .schema.ts) - Ignorado`
@@ -143,6 +153,56 @@ export class AutoGeneratorDDD {
       }`
     );
     console.log("================================================\n");
+  }
+
+  /**
+   * Gera DDD a partir da interface única DDDSchemaInput (sem depender de Zod).
+   * Uso: defina um objeto que satisfaça DDDSchemaInput e chame este método.
+   */
+  async generateFromInput(
+    input: DDDSchemaInput,
+    outputPath?: string
+  ): Promise<void> {
+    const metadata = dddSchemaToEntityMetadata(input);
+    const entityName = (input.name ?? input.title ?? "Entity").replace(/^\w/, (c) => c.toUpperCase());
+    const modulesPath = resolve(this.options.modulesPath);
+    const moduleName = entityName.charAt(0).toLowerCase() + entityName.slice(1);
+    const modulePath = outputPath ?? join(modulesPath, moduleName);
+    if (!existsSync(modulePath)) {
+      mkdirSync(modulePath, { recursive: true });
+    }
+    await this.generateDDDStructure(metadata, modulePath);
+  }
+
+  /** Detecta se o valor é um schema Zod (tem _def) */
+  private static isZodSchemaObject(value: unknown): value is import("zod").ZodTypeAny {
+    return (
+      typeof value === "object" &&
+      value !== null &&
+      "_def" in value &&
+      typeof (value as any)._def === "object"
+    );
+  }
+
+  /** Loga metadados e gera estrutura DDD */
+  private async logMetadataAndGenerate(
+    metadata: EntityMetadata,
+    entityName: string,
+    modulePath: string,
+    filePath?: string
+  ): Promise<void> {
+    console.log(`   📊 Schema analisado com sucesso:`);
+    console.log(`      • Nome da entidade: ${metadata.name}`);
+    console.log(`      • Campos detectados: ${metadata.fields.length}`);
+    console.log(
+      `      • Tipos de campos: ${metadata.fields.map((f) => f.type).join(", ")}`
+    );
+    if (this.options.verbose) {
+      console.log(`📊 Schema analisado: ${metadata.fields.length} campos detectados`);
+    }
+    console.log(`   🏗️  Iniciando geração da estrutura DDD...`);
+    await this.generateDDDStructure(metadata, modulePath, filePath);
+    console.log(`   ✅ Estrutura DDD gerada para ${entityName}!`);
   }
 
   /**
@@ -202,45 +262,55 @@ export class AutoGeneratorDDD {
 
       console.log(`   ✅ Arquivo importado com sucesso`);
 
-      if (importedModule.schema) {
-        console.log(`   🎯 Schema Zod encontrado no arquivo!`);
-        console.log(`   🔍 Analisando schema...`);
+      const schemaOrDdd = importedModule.schema ?? importedModule.dddSchema;
+      if (schemaOrDdd) {
+        const isZodSchema = AutoGeneratorDDD.isZodSchemaObject(schemaOrDdd);
+        const isDddOrJsonSchema =
+          typeof schemaOrDdd === "object" &&
+          schemaOrDdd !== null &&
+          "properties" in schemaOrDdd &&
+          typeof (schemaOrDdd as any).properties === "object";
 
-        try {
-          const metadata = ZodSchemaAnalyzer.analyzeSchema(
-            importedModule.schema,
-            entityName
-          );
-
-          console.log(`   📊 Schema analisado com sucesso:`);
-          console.log(`      • Nome da entidade: ${metadata.name}`);
-          console.log(`      • Campos detectados: ${metadata.fields.length}`);
-          console.log(
-            `      • Tipos de campos: ${metadata.fields
-              .map((f) => f.type)
-              .join(", ")}`
-          );
-
-          if (this.options.verbose) {
-            console.log(
-              `📊 Schema analisado: ${metadata.fields.length} campos detectados`
+        if (isZodSchema) {
+          console.log(`   🎯 Schema Zod encontrado no arquivo!`);
+          console.log(`   🔍 Analisando schema...`);
+          try {
+            const metadata = ZodSchemaAnalyzer.analyzeSchema(
+              schemaOrDdd,
+              entityName
+            );
+            await this.logMetadataAndGenerate(metadata, entityName, modulePath, filePath);
+          } catch (schemaError: any) {
+            console.warn(
+              `   ⚠️  Erro ao analisar schema em ${fileName}:`,
+              schemaError.message
+            );
+            console.warn(`   🚫 Pulando arquivo - não é um schema Zod válido`);
+          }
+        } else if (isDddOrJsonSchema) {
+          console.log(`   🎯 Schema (interface única / JSON-Schema) encontrado!`);
+          try {
+            const dddInput: DDDSchemaInput =
+              "properties" in schemaOrDdd &&
+              !("_def" in schemaOrDdd)
+                ? jsonSchemaToDDDSchema(schemaOrDdd as JSONSchemaLike, entityName)
+                : (schemaOrDdd as DDDSchemaInput);
+            const metadata = dddSchemaToEntityMetadata(dddInput);
+            await this.logMetadataAndGenerate(metadata, entityName, modulePath, filePath);
+          } catch (schemaError: any) {
+            console.warn(
+              `   ⚠️  Erro ao processar DDDSchemaInput em ${fileName}:`,
+              schemaError.message
             );
           }
-
-          console.log(`   🏗️  Iniciando geração da estrutura DDD...`);
-          await this.generateDDDStructure(metadata, modulePath, filePath);
-
-          console.log(`   ✅ Estrutura DDD gerada para ${entityName}!`);
-        } catch (schemaError: any) {
-          console.warn(
-            `   ⚠️  Erro ao analisar schema em ${fileName}:`,
-            schemaError.message
+        } else {
+          console.log(
+            `   ℹ️  Arquivo ${fileName} não contém schema Zod nem DDDSchemaInput (ignorando)`
           );
-          console.warn(`   🚫 Pulando arquivo - não é um schema Zod válido`);
         }
       } else {
         console.log(
-          `   ℹ️  Arquivo ${fileName} não contém schema Zod (ignorando)`
+          `   ℹ️  Arquivo ${fileName} não contém schema ou dddSchema (ignorando)`
         );
       }
     } catch (error: any) {
@@ -250,7 +320,33 @@ export class AutoGeneratorDDD {
   }
 
   /**
+   * Gera estrutura DDD a partir de arquivo .schema.json (JSON-Schema)
+   */
+  private async generateFromJsonSchemaFile(
+    fileName: string,
+    filePath: string,
+    modulesPath: string
+  ): Promise<void> {
+    const entityName = ZodSchemaAnalyzer.extractEntityName(
+      fileName.replace(".schema.json", "")
+    );
+    const moduleName = entityName.toLowerCase();
+    const modulePath = join(modulesPath, moduleName);
+
+    try {
+      const raw = readFileSync(filePath, "utf-8");
+      const schema = JSON.parse(raw) as JSONSchemaLike;
+      const dddInput = jsonSchemaToDDDSchema(schema, entityName);
+      const metadata = dddSchemaToEntityMetadata(dddInput);
+      await this.logMetadataAndGenerate(metadata, entityName, modulePath, filePath);
+    } catch (error: any) {
+      console.error(`   ❌ Erro ao processar ${fileName}:`, error.message);
+    }
+  }
+
+  /**
    * Gera estrutura completa DDD a partir de arquivo de schema existente
+   * Aceita Zod (schema), DDDSchemaInput (dddSchema) ou JSON-Schema (objeto com properties)
    */
   private async generateFromSchemaFile(
     schemaPath: string,
@@ -260,14 +356,27 @@ export class AutoGeneratorDDD {
     try {
       const moduleUrl = `file://${resolve(schemaPath)}`;
       const importedModule = await import(moduleUrl);
+      const schemaOrDddFromFile = importedModule.schema ?? importedModule.dddSchema;
+      if (!schemaOrDddFromFile) return;
 
-      if (importedModule.schema) {
-        const entityName = ZodSchemaAnalyzer.extractEntityName(moduleName);
+      const entityName = ZodSchemaAnalyzer.extractEntityName(moduleName);
+
+      if (AutoGeneratorDDD.isZodSchemaObject(schemaOrDddFromFile)) {
         const metadata = ZodSchemaAnalyzer.analyzeSchema(
-          importedModule.schema,
+          schemaOrDddFromFile,
           entityName
         );
-
+        await this.generateDDDStructure(metadata, modulePath);
+      } else if (
+        typeof schemaOrDddFromFile === "object" &&
+        schemaOrDddFromFile !== null &&
+        "properties" in schemaOrDddFromFile
+      ) {
+        const dddInput: DDDSchemaInput = jsonSchemaToDDDSchema(
+          schemaOrDddFromFile as JSONSchemaLike,
+          entityName
+        );
+        const metadata = dddSchemaToEntityMetadata(dddInput);
         await this.generateDDDStructure(metadata, modulePath);
       }
     } catch (error) {
@@ -2343,6 +2452,7 @@ ${vo.fields
 
 /**
  * Função utilitária para executar geração DDD automática
+ * (Zod, DDDSchemaInput ou JSON-Schema conforme arquivos em modulesPath)
  */
 export async function autoGenerateDDDFromZodSchemas(
   options?: DDDGenerationOptions
@@ -2350,6 +2460,20 @@ export async function autoGenerateDDDFromZodSchemas(
   const generator = new AutoGeneratorDDD(options);
   await generator.generate();
 }
+
+/**
+ * Gera DDD a partir da interface única DDDSchemaInput (ou JSON-Schema).
+ * Uso: defina um objeto que satisfaça DDDSchemaInput e chame esta função.
+ */
+export async function generateFromDDDSchema(
+  input: DDDSchemaInput,
+  options?: DDDGenerationOptions & { outputPath?: string }
+): Promise<void> {
+  const generator = new AutoGeneratorDDD(options);
+  await generator.generateFromInput(input, options?.outputPath);
+}
+
+export type { DDDSchemaInput, FieldSchemaInput } from "./ddd-schema-types.js";
 
 /**
  * Função para desenvolvimento - limpar módulos DDD gerados

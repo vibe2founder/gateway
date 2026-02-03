@@ -119,7 +119,42 @@ src/modules/user/
 └── index.ts
 ```
 
-## 📋 Schema Zod do Exemplo
+## 📋 Entrada: 1 interface TS ou JSON-Schema
+
+O gerador aceita **três formas de entrada**:
+
+### 1. Interface única TypeScript (DDDSchemaInput)
+
+Uma única interface compatível com JSON-Schema — sem depender de Zod para entrada:
+
+```typescript
+import type { DDDSchemaInput } from "../src/ddd-schema-types.js";
+import { generateFromDDDSchema } from "../src/auto-generator-ddd.js";
+
+const orderSchema: DDDSchemaInput = {
+  name: "Order",
+  title: "Order",
+  properties: {
+    id: { type: "string", format: "uuid" },
+    total: { type: "number", minimum: 0 },
+    status: { type: "string", enum: ["pending", "confirmed"], default: "pending" },
+    createdAt: { type: "date" },
+    updatedAt: { type: "date" },
+  },
+  required: ["id", "total", "status", "createdAt", "updatedAt"],
+  primaryKey: "id",
+};
+
+await generateFromDDDSchema(orderSchema, { outputPath: "src/modules/order" });
+```
+
+Execute: `npm run example:ddd:interface` (usa `examples/order.ddd.ts`).
+
+### 2. JSON-Schema (.schema.json)
+
+Coloque um arquivo `.schema.json` na pasta de módulos (ex.: `src/modules/product.schema.json`). O gerador converte para DDDSchemaInput e gera a estrutura DDD. Exemplo em `examples/product.schema.json`.
+
+### 3. Schema Zod (.schema.ts)
 
 O arquivo `user.schema.ts` demonstra um schema completo com:
 
