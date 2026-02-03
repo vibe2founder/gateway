@@ -3,7 +3,7 @@
 ÔØä´©Å­ƒæü´©Å CrystalBox Mode v1.0.0 dispon├¡vel
 ­ƒöº Ambiente: development
 ­ƒôí Modos: Black Box | Glass Box | ÔØä´©Å­ƒæü´©Å CrystalBox
-­ƒÄ¿ Sistema de Decorators @purecore/apify inicializado
+­ƒÄ¿ Sistema de Decorators @purecore/one-api-4-allinicializado
 ­ƒöº Inicializando sistemas especiais...
 ­ƒöô NO_AUTH routes exclu├¡das: get /health, post /login, get /status
 ­ƒöù WS Retry Channel: Ativado

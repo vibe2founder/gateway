@@ -7,10 +7,10 @@ type TemplateKind = 'crud';
 
 const HELP_MESSAGE = `
 Uso:
-  npx @purecore/apify create crud <resource> [--entry src/index.ts]
+  npx @purecore/one-api-4-allcreate crud <resource> [--entry src/index.ts]
 
 Exemplo:
-  npx @purecore/apify create crud users
+  npx @purecore/one-api-4-allcreate crud users
 `.trim();
 
 const args = process.argv.slice(2);

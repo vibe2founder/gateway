@@ -16,7 +16,9 @@ const testFiles = [
   'test-resilience-features.ts'
 ];
 
-console.log('🧪 Running comprehensive tests for @purecore/apify framework...\n');
+console.log(
+  "🧪 Running comprehensive tests for @purecore/one-api-4-allframework...\n",
+);
 
 let totalTests = 0;
 let passedTests = 0;

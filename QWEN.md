@@ -1,4 +1,4 @@
-# @purecore/apify - One API 4 All
+# @purecore/one-api-4-all- One API 4 All
 
 ## Project Overview
 
@@ -138,7 +138,7 @@ const apiRouter = new Apify();
 apiRouter.get('/status', (req, res) => res.json({ status: 'ok' }));
 app.use('/api', apiRouter);
 
-app.listen(3344, () => console.log('@purecore/apify rodando na porta 3344'));
+app.listen(3344, () => console.log('@purecore/one-api-4-allrodando na porta 3344'));
 ```
 
 ### Auto-Generation from Zod Schema
@@ -267,7 +267,7 @@ src/
 
 ### CLI Generator
 ```bash
-npx @purecore/apify create crud users
+npx @purecore/one-api-4-allcreate crud users
 ```
 
 This command generates a complete CRUD module with all necessary files and registers it in your main application.

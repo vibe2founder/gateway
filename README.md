@@ -51,7 +51,7 @@ const apiRouter = new Apify();
 apiRouter.get('/status', (req, res) =&gt; res.json({ status: 'ok' }));
 app.use('/api', apiRouter);
 
-app.listen(3344, () =&gt; console.log('@purecore/apify rodando na porta 3344'));
+app.listen(3344, () =&gt; console.log('@purecore/one-api-4-allrodando na porta 3344'));
 </code></pre>
 
 <h2 style="color: rgb(0, 213, 255); font-size: 48px; text-align: center; font-weight: bold;">Template</h2>
@@ -79,7 +79,7 @@ app.use('/users', usersRouter);
 
 <p>Você pode criar módulos automaticamente com:</p>
 
-<pre><code>npx @purecore/apify create crud users
+<pre><code>npx @purecore/one-api-4-allcreate crud users
 </code></pre>
 
 <p>O comando fará duas coisas:</p>
@@ -91,7 +91,7 @@ app.use('/users', usersRouter);
 
 <p>Caso seu arquivo principal esteja em outro caminho, passe <code>--entry</code>:</p>
 
-<pre><code>npx @purecore/apify create crud billing --entry apps/api/src/main.ts
+<pre><code>npx @purecore/one-api-4-allcreate crud billing --entry apps/api/src/main.ts
 </code></pre>
 
 <h2 style="color: rgb(0, 213, 255); font-size: 48px; text-align: center; font-weight: bold;">Decorators disponíveis</h2>
@@ -195,7 +195,7 @@ const apiRouter = new Apify();
 apiRouter.get('/status', (req, res) => res.json({ status: 'ok' }));
 app.use('/api', apiRouter);
 
-app.listen(3344, () => console.log('@purecore/apify rodando na porta 3344'));
+app.listen(3344, () => console.log('@purecore/one-api-4-allrodando na porta 3344'));
 ```
 
 ## Template `modules/<resource>/routes.ts`
@@ -222,7 +222,7 @@ app.use('/users', usersRouter);
 Você pode criar módulos automaticamente com:
 
 ```bash
-npx @purecore/apify create crud users
+npx @purecore/one-api-4-allcreate crud users
 ```
 
 O comando fará duas coisas:
@@ -233,7 +233,7 @@ O comando fará duas coisas:
 Caso seu arquivo principal esteja em outro caminho, passe `--entry`:
 
 ```bash
-npx @purecore/apify create crud billing --entry apps/api/src/main.ts
+npx @purecore/one-api-4-allcreate crud billing --entry apps/api/src/main.ts
 ```
 
 ## Auto-Geração de Código Baseado em Schemas Zod 🚀

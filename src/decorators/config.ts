@@ -647,7 +647,7 @@ export function setupCommonDependencies() {
  * Inicialização completa do sistema de decorators
  */
 export function initializeDecorators() {
-  console.log("🎨 Sistema de Decorators @purecore/apify inicializado");
+  console.log("🎨 Sistema de Decorators @purecore/one-api-4-allinicializado");
 
   // Registrar dependências comuns
   setupCommonDependencies();

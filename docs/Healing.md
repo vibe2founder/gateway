@@ -205,4 +205,4 @@ if (mapping) {
 
 ## Conclusão
 
-O módulo de Healing do @purecore/apify é uma implementação avançada de auto-correção que melhora significativamente a resiliência e robustez das APIs. Com estratégias inteligentes para diferentes tipos de erros e um sistema de mapeamento semântico poderoso, ele permite que as aplicações se adaptem automaticamente a variações e problemas comuns, proporcionando uma experiência mais estável e confiável para os usuários.
+O módulo de Healing do @purecore/one-api-4-allé uma implementação avançada de auto-correção que melhora significativamente a resiliência e robustez das APIs. Com estratégias inteligentes para diferentes tipos de erros e um sistema de mapeamento semântico poderoso, ele permite que as aplicações se adaptem automaticamente a variações e problemas comuns, proporcionando uma experiência mais estável e confiável para os usuários.

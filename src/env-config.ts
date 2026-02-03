@@ -4,7 +4,7 @@
  */
 
 export const DEFAULT_ENV_CONFIG = `# =========================================
-# @purecore/apify - Configuração Padrão
+# @purecore/one-api-4-all- Configuração Padrão
 # =========================================
 # Esta configuração ativa TODOS os decorators por padrão
 # A biblioteca vem "completa" sem que o dev precise fazer nada

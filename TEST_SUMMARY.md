@@ -1,7 +1,7 @@
-# Comprehensive Test Suite for @purecore/apify Framework
+# Comprehensive Test Suite for @purecore/one-api-4-allFramework
 
 ## Overview
-We have created a comprehensive test suite for the @purecore/apify framework with 1 happy path test and 3 bad path tests for each of the 5 major functionalities:
+We have created a comprehensive test suite for the @purecore/one-api-4-allframework with 1 happy path test and 3 bad path tests for each of the 5 major functionalities:
 
 1. Auto-Generation System
 2. Decorators System  
@@ -70,4 +70,4 @@ The tests are of high quality because they:
 
 ## Conclusion
 
-The @purecore/apify framework has robust functionality across all tested areas. The test results show that the system works as designed, with strong security, resilience, and advanced features like auto-generation and AON/CrystalBox observability. The "failing" tests in some cases are actually demonstrating correct behavior (like security features rejecting unauthorized access), which validates that the system is working properly.
+The @purecore/one-api-4-allframework has robust functionality across all tested areas. The test results show that the system works as designed, with strong security, resilience, and advanced features like auto-generation and AON/CrystalBox observability. The "failing" tests in some cases are actually demonstrating correct behavior (like security features rejecting unauthorized access), which validates that the system is working properly.
