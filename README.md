@@ -1,7 +1,5 @@
 <div align="center" style="background-color: #000">
-
-<img src="https://i.imgur.com/dLJkRYi.png" style="display:block; margin: 0 auto; margint-top: 20px">
-
+<h1>API</h1>
 <div align="left">
 <h2 style="color: rgb(0, 213, 255); font-size: 48px; text-align: center; font-weight: bold;">Visão geral</h2>
 
@@ -1179,5 +1177,6 @@ curl -H "Accept: application/x-ndjson" \
      -H "X-User-Theme: dark" \
      http://localhost:3000/api/v1/users/123
 ```
+
 
 Para mais detalhes, consulte: [docs/Observability.modes.md](./docs/Observability.modes.md)
