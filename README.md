@@ -1,5 +1,5 @@
 <div align="center" style="background-color: #000">
-<h1>API</h1>
+<h1>Gayeway</h1>
 <div align="left">
 <h2 style="color: rgb(0, 213, 255); font-size: 48px; text-align: center; font-weight: bold;">Visão geral</h2>
 
@@ -1180,3 +1180,4 @@ curl -H "Accept: application/x-ndjson" \
 
 
 Para mais detalhes, consulte: [docs/Observability.modes.md](./docs/Observability.modes.md)
+
